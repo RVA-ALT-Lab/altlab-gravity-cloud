@@ -20,26 +20,14 @@ add_action('wp_enqueue_scripts', 'gqcloud_load_scripts');
 function gqcloud_load_scripts() {                           
     $deps = array();
     $version= '1.0'; 
-    $in_footer = false;    
+    $in_footer = true;    
     wp_enqueue_script('gravity-cloud-main-js', plugin_dir_url( __FILE__) . 'js/gravity-cloud-main.js',$deps, $version, $in_footer); 
     wp_enqueue_style( 'gravity-cloud-main-css', plugin_dir_url( __FILE__) . 'css/gravity-cloud-main.css');  
+    wp_enqueue_script('gravity-cloud-indiv-js', plugin_dir_url( __FILE__) . 'js/gravity-cloud-indiv.js',array('gravity-cloud-main-js'), $version, true); 
+    wp_localize_script('gravity-cloud-indiv-js', '', '');
 }
 
 
-
-//TEMPooooooorary
-
-function my_the_content_filter($content) {
-  // assuming you have created a page/post entitled 'debug'
- $script = "<script>
-let list = [['bar', 56], ['buzz', 72], ['spanish', 21], ['green', 11]];
-var attempt = WordCloud(document.getElementById('demo'), { list: list } );
-</script>";
-
-  return $content . $script;
-}
-
-add_filter( 'the_content', 'my_the_content_filter' );
 
 
 function get_gform_words($form_id){
@@ -53,18 +41,39 @@ function get_gform_words($form_id){
 
   $entries = GFAPI::get_entries($form_id, $search_criteria, $sorting, $paging, $total_count );
   $raw = "";
+  $tag_data = [];
   foreach ($entries as $key => $value) {
   	# code...
   	 //print("<pre>".print_r($value[2],true)."</pre>");
   	 $raw .= $value[2];
      //$common_removed = remove_common_words($raw);
-  	 $no_punctuation = preg_replace("/(?!['=$%-])\p{P}/u", "",$raw);
+  	 $no_punctuation = preg_replace("/(?![=$%-])\p{P}/u", "",$raw);
   	 $bits = preg_split('/\s+/', $no_punctuation);
-		print("<pre>".print_r($bits,true)."</pre>");
+     foreach ($bits as $key => $bit) {
+       # code...
+      if(multiKeyExists($tag_data, $bit)) {
+        $i = $tag_data[$bit] = $tag_data[$bit]+1;
+      } else {
+        $tag_data[$bit] = 1;
+      }
+     }   
   }
  
-
+     //print("<pre>".print_r($tag_data,true)."</pre>");
+     $formatted = '['.data_to_tag_format ($tag_data) . ']';
+     //print("<pre>".print_r($formatted,true)."</pre>");
+     return $formatted;
 }
+
+
+function data_to_tag_format ($data){
+  $cloud_data = '';
+  foreach ($data as $key => $tag) {
+    $cloud_data .= "['" . $key ."'," . $tag . '], ';
+  }
+  return $cloud_data;
+}
+
 
 function gqcloud_make_the_list( $atts, $content = null ) {
     extract(shortcode_atts( array(
@@ -78,6 +87,32 @@ function gqcloud_make_the_list( $atts, $content = null ) {
 	
 }
 add_shortcode( 'gcloud', 'gqcloud_make_the_list' );
+
+
+function increment_tag_count($array, $key){
+   $array[$key] = (int)$array[$key]+1;
+}
+
+function multiKeyExists(array $arr, $key) {
+
+    // is in base array?
+    if (array_key_exists($key, $arr)) {
+        return true;
+    }
+
+    // check arrays contained in this array
+    foreach ($arr as $element) {
+        if (is_array($element)) {
+            if (multiKeyExists($element, $key)) {
+                return true;
+            }
+        }
+
+    }
+
+    return false;
+}
+
 
 
 //REMOVE CERTAIN WORDS
