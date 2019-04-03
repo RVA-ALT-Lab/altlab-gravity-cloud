@@ -24,10 +24,8 @@ function gqcloud_load_scripts() {
     wp_enqueue_script('gravity-cloud-main-js', plugin_dir_url( __FILE__) . 'js/gravity-cloud-main.js',$deps, $version, $in_footer); 
     wp_enqueue_style( 'gravity-cloud-main-css', plugin_dir_url( __FILE__) . 'css/gravity-cloud-main.css');  
     wp_enqueue_script('gravity-cloud-indiv-js', plugin_dir_url( __FILE__) . 'js/gravity-cloud-indiv.js',array('gravity-cloud-main-js'), $version, true); 
-    wp_localize_script('gravity-cloud-indiv-js', '', '');
+
 }
-
-
 
 
 function get_gform_words($form_id){
@@ -60,39 +58,49 @@ function get_gform_words($form_id){
   }
  
      //print("<pre>".print_r($tag_data,true)."</pre>");
-     $formatted = '['.data_to_tag_format ($tag_data) . ']';
+     //$formatted = '['.data_to_tag_format ($tag_data) . ']';
      //print("<pre>".print_r($formatted,true)."</pre>");
-     return $formatted;
+     return $tag_data;
 }
 
-
 function data_to_tag_format ($data){
-  $cloud_data = '';
+  $cloud_data = array();
   foreach ($data as $key => $tag) {
-    $cloud_data .= "['" . $key ."'," . $tag . '], ';
+    $cloud_data[$key]= $tag;
   }
   return $cloud_data;
 }
 
 
+//SHORTCODE THAT RETURNS THE ID
 function gqcloud_make_the_list( $atts, $content = null ) {
     extract(shortcode_atts( array(
          'id' => '', //gform ID        
     ), $atts));         
 
     if($id){
-    	$entries = get_gform_words($id);
-       return $entries;
+    	$entries = get_gform_words($id);      
     }    
-	
+   //return $entries;
+    $cloud_data = array(          
+           'source' => json_encode($entries)
+       );
+    wp_localize_script('gravity-cloud-indiv-js', 'cloudData', $cloud_data); //sends data to script as variable
+	  return '<div id="demo" style="width:100%; height: 860px; position: relative;">foo</div>';
 }
 add_shortcode( 'gcloud', 'gqcloud_make_the_list' );
 
 
+//WORKER FUNCTIONS
+
+
+//COUNTS THE WORD 
 function increment_tag_count($array, $key){
    $array[$key] = (int)$array[$key]+1;
 }
 
+
+//CHECKS FOR DUCPLICATES
 function multiKeyExists(array $arr, $key) {
 
     // is in base array?
