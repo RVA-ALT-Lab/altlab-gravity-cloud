@@ -2,7 +2,7 @@
 /*
 Plugin Name: ALT Lab Gravity Cloud
 Plugin URI:  https://github.com/
-Description: Makes a word cloud of your gravity form based on the shortcode [gcloud id=''] with ID being the gravity form ID. Use wordcloud2.js
+Description: Makes a word cloud of your gravity form based on the shortcode [gcloud id='' fields=''] with ID being the gravity form ID. Use wordcloud2.js. Will use form id 1 and field 1 if no variables are set.
 Version:     1.0
 Author:      ALT Lab
 Author URI:  http://altlab.vcu.edu
@@ -28,7 +28,7 @@ function gqcloud_load_scripts() {
 }
 
 
-function get_gform_words($form_id){
+function get_gform_words($form_id, $fields){
 	$search_criteria = array(
     'status'        => 'active',
 );
@@ -40,10 +40,14 @@ function get_gform_words($form_id){
   $entries = GFAPI::get_entries($form_id, $search_criteria, $sorting, $paging, $total_count );
   $raw = "";
   $tag_data = [];
+  $fields_array = explode(',',$fields);
   foreach ($entries as $key => $value) {
   	# code...
-  	 //print("<pre>".print_r($value[2],true)."</pre>");
-  	 $raw .= $value[2];
+  	 //print("<pre>".print_r($value[2],true)."</pre>");  	 
+     foreach ($fields_array as $field_id) {
+       $raw .= $value[$field_id];
+     }
+    
      //$common_removed = remove_common_words($raw);
   	 $no_punctuation = preg_replace("/(?![=$%-])\p{P}/u", "",$raw);
   	 $bits = preg_split('/\s+/', $no_punctuation);
@@ -75,12 +79,20 @@ function data_to_tag_format ($data){
 //SHORTCODE THAT RETURNS THE ID
 function gqcloud_make_the_list( $atts, $content = null ) {
     extract(shortcode_atts( array(
-         'id' => '', //gform ID        
+         'id' => '', //gform ID   
+         'fields' => '',     
     ), $atts));         
-
-    if($id){
-    	$entries = get_gform_words($id);      
-    }    
+    if($id){      
+    	$id = $id;   
+    } else {
+      $id = 1;
+    } 
+    if ($fields){
+      $fields = $fields;
+    }  else {
+      $fields = 1;
+    }
+    $entries = get_gform_words($id, $fields);   
    //return $entries;
     $cloud_data = array(          
            'source' => json_encode($entries)
