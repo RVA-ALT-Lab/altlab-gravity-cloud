@@ -7,16 +7,16 @@ for(var i in a){
 	b.push([i, a[i]]);
 }
 
-var attempt = WordCloud(document.getElementById('demo'), { 
+var attempt = WordCloud(document.getElementById('gc-cloud'), { 
   list: b,  
   fontFamily: 'Times, serif', 
   rotateRatio: 0.5,
   rotationSteps: 2,
   backgroundColor: '#fff',  
   drawOutOfBound: true,
-  gridSize: Math.round(16 * jQuery('#demo').width() / 1024),
+  gridSize: Math.round(16 * jQuery('#gc-cloud').width() / 1024),
   weightFactor: function (size) {
-    return Math.pow(size, weight) * jQuery('#demo').width() / 1024;
+    return Math.pow(size, weight) * jQuery('#gc-cloud').width() / 1024;
   },
   minFontSize: 200,
 

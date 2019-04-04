@@ -1,8 +1,8 @@
 <?php 
 /*
 Plugin Name: ALT Lab Gravity Cloud
-Plugin URI:  https://github.com/
-Description: Makes a word cloud of your gravity form based on the shortcode [gcloud id='' fields='' size=''] with ID being the gravity form ID. Use wordcloud2.js. Will use form id=1 and fields=1 and size=1.6 if no variables are set.
+Plugin URI:  https://github.com/RVA-ALT-Lab/altlab-gravity-cloud
+Description: Makes a word cloud of your gravity form based on the shortcode [gcloud id='' fields='' size=''] with ID being the gravity form ID. Uses wordcloud2.js to create the cloud. Will use form id=1 and fields=1 and size=1.6 if no variables are set.
 Version:     1.0
 Author:      ALT Lab
 Author URI:  http://altlab.vcu.edu
@@ -17,14 +17,10 @@ defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 add_action('wp_enqueue_scripts', 'gqcloud_load_scripts');
 
-function gqcloud_load_scripts() {                           
-    $deps = array();
-    $version= '1.0'; 
-    $in_footer = true;    
-    wp_enqueue_script('gravity-cloud-main-js', plugin_dir_url( __FILE__) . 'js/gravity-cloud-main.js',$deps, $version, $in_footer); 
+function gqcloud_load_scripts() {                              
+    wp_enqueue_script('gravity-cloud-main-js', plugin_dir_url( __FILE__) . 'js/gravity-cloud-main.js',array(), '1.0', true); 
     wp_enqueue_style( 'gravity-cloud-main-css', plugin_dir_url( __FILE__) . 'css/gravity-cloud-main.css');  
-    wp_enqueue_script('gravity-cloud-indiv-js', plugin_dir_url( __FILE__) . 'js/gravity-cloud-indiv.js',array('gravity-cloud-main-js'), $version, true); 
-
+    wp_enqueue_script('gravity-cloud-indiv-js', plugin_dir_url( __FILE__) . 'js/gravity-cloud-indiv.js',array('gravity-cloud-main-js'),'1.0', true); 
 }
 
 
@@ -105,7 +101,7 @@ function gqcloud_make_the_list( $atts, $content = null ) {
            'size' => $size,
        );
     wp_localize_script('gravity-cloud-indiv-js', 'cloudData', $cloud_data); //sends data to script as variable
-	  return '<div id="demo" style="100%; height: 50vw; position: relative;">foo</div>';
+	  return '<div id="gc-cloud" style="100%; height: 50vw; position: relative;">foo</div>';
 }
 add_shortcode( 'gcloud', 'gqcloud_make_the_list' );
 
