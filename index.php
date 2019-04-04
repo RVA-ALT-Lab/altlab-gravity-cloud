@@ -2,7 +2,7 @@
 /*
 Plugin Name: ALT Lab Gravity Cloud
 Plugin URI:  https://github.com/
-Description: Makes a word cloud of your gravity form based on the shortcode [gcloud id='' fields=''] with ID being the gravity form ID. Use wordcloud2.js. Will use form id 1 and field 1 if no variables are set.
+Description: Makes a word cloud of your gravity form based on the shortcode [gcloud id='' fields='' size=''] with ID being the gravity form ID. Use wordcloud2.js. Will use form id=1 and fields=1 and size=1.6 if no variables are set.
 Version:     1.0
 Author:      ALT Lab
 Author URI:  http://altlab.vcu.edu
@@ -80,7 +80,8 @@ function data_to_tag_format ($data){
 function gqcloud_make_the_list( $atts, $content = null ) {
     extract(shortcode_atts( array(
          'id' => '', //gform ID   
-         'fields' => '',     
+         'fields' => '',
+         'size' => '',     
     ), $atts));         
     if($id){      
     	$id = $id;   
@@ -92,13 +93,19 @@ function gqcloud_make_the_list( $atts, $content = null ) {
     }  else {
       $fields = 1;
     }
+     if ($size){
+      $size = $size;
+     } else {
+      $size = 1.6;
+     }
     $entries = get_gform_words($id, $fields);   
    //return $entries;
     $cloud_data = array(          
-           'source' => json_encode($entries)
+           'source' => json_encode($entries),
+           'size' => $size,
        );
     wp_localize_script('gravity-cloud-indiv-js', 'cloudData', $cloud_data); //sends data to script as variable
-	  return '<div id="demo" style="width:100%; height: 860px; position: relative;">foo</div>';
+	  return '<div id="demo" style="100%; height: 50vw; position: relative;">foo</div>';
 }
 add_shortcode( 'gcloud', 'gqcloud_make_the_list' );
 
