@@ -37,9 +37,7 @@ function get_gform_words($form_id, $fields){
   $raw = "";
   $tag_data = [];
   $fields_array = explode(',',$fields);
-  foreach ($entries as $key => $value) {
-  	# code...
-  	 //print("<pre>".print_r($value[2],true)."</pre>");  	 
+  foreach ($entries as $key => $value) {	 
      foreach ($fields_array as $field_id) {
        $raw .= $value[$field_id];
      }
@@ -56,10 +54,7 @@ function get_gform_words($form_id, $fields){
       }
      }   
   }
- 
      //print("<pre>".print_r($tag_data,true)."</pre>");
-     //$formatted = '['.data_to_tag_format ($tag_data) . ']';
-     //print("<pre>".print_r($formatted,true)."</pre>");
      return $tag_data;
 }
 
@@ -72,7 +67,7 @@ function data_to_tag_format ($data){
 }
 
 
-//SHORTCODE THAT RETURNS THE ID
+//SHORTCODE 
 function gqcloud_make_the_list( $atts, $content = null ) {
     extract(shortcode_atts( array(
          'id' => '', //gform ID   
