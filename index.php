@@ -39,7 +39,7 @@ function get_gform_words($form_id, $fields){
   $fields_array = explode(',',$fields);
   foreach ($entries as $key => $value) {	 
      foreach ($fields_array as $field_id) {
-       $raw .= $value[$field_id];
+       $raw .= $value[$field_id] . ' ';
      }
     
      //$common_removed = remove_common_words($raw);
